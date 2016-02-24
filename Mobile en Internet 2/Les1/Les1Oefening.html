@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="nl">
+	<head>
+		<meta charset="utf-8" >
+		<meta name="description" content="beschrijving van de webpagina" >
+		<meta name="keywords" content="trefwoorden, gescheiden, door, komma's">
+        <meta name="viewport" content="width=device-width, height=device-height" />
+		<title>Titel van de webpagina</title>
+        
+	</head>
+
+	<body>
+        <!--Deel1-->
+        <script type="text/javascript">
+            "use strict";
+            
+            function optellen(getal1, getal2) 
+            {
+                return getal1 + getal2;
+            }
+            function aftrekken(getal1, getal2) 
+            {
+                return getal1 - getal2;
+            }
+            function vermenigvuldigen(getal1, getal2) 
+            {
+                return getal1 * getal2;
+            }
+            function delen(getal1, getal2) 
+            {
+                return getal1 / getal2;
+            }
+
+            document.write(optellen(5,3) + '<br>');
+            document.write(aftrekken(10,9) + '<br>');
+            document.write(vermenigvuldigen(5,5) + '<br>');
+            document.write(delen(16,2) + '<br>');
+        </script>
+        
+        <!--Deel2-->
+        <script type="text/javascript">
+        "use strict";
+            function berekening()
+            {
+                this.getal1 = 0;
+                this.getal2 = 0;
+                
+                this.optellen = function()
+                {
+                    return this.getal1 + this.getal2;
+                }
+                this.aftrekken = function()
+                {
+                    return this.getal1 - this.getal2;
+                }
+                this.vermenigvuldigen = function()
+                {
+                    return this.getal1 * this.getal2;
+                }
+                this.delen = function()
+                {
+                    return this.getal1 / this.getal2;
+                }
+            }
+            
+            var rekenmachine = new berekening();
+            rekenmachine.getal1 = 12;
+            rekenmachine.getal2 = 3;
+            document.write(rekenmachine.optellen() + '<br>');
+            document.write(rekenmachine.aftrekken() + '<br>');
+            document.write(rekenmachine.vermenigvuldigen() + '<br>');
+            document.write(rekenmachine.delen() + '<br>');
+            
+        </script>
+
+   
+	</body>
+</html>
