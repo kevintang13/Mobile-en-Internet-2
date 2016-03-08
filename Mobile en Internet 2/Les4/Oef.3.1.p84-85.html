@@ -23,7 +23,7 @@
             "use strict!";
             var plaats = $("li").last().detach();
             
-            $("ul").prepend("<li>Mechelen</li>");
+            $("ul").prepend(plaats);
             var aantal =$("li").length;
             $("body").prepend("Aantal plaatsen: " + aantal);
             $("li").append(" 125 graden Celsius");
