@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="nl">
+	<head>
+		<meta charset="utf-8" >
+		<meta name="description" content="beschrijving van de webpagina" >
+		<meta name="keywords" content="trefwoorden, gescheiden, door, komma's">
+        <meta name="viewport" content="width=device-width, height=device-height" />
+		<title>Titel van de webpagina</title>
+        <link rel="stylesheet" href="Oefening.css">
+	</head>
+
+	<body>
+        <!--Schaakbord-->
+        
+        
+        <script type="text/javascript">
+            "use strict";
+            // toont de gevegen element en verstopt de rest van de pages
+            function show(elementID) 
+            {
+                var ele = document.getElementById(elementID);
+
+                // gaat over alle elementen met classe page en verstopt ze
+                var pages = document.getElementsByClassName('page');
+                for(var i = 0; i < pages.length; i++) 
+                {
+                    pages[i].style.display = 'none';
+                }
+
+                // then show the requested page
+                ele.style.display = 'block';
+            }
+            
+            function showH(element, hide)
+            {
+                document.getElementById(element).style.visibility = 'visible';
+                document.getElementById(hide).style.visibility = 'hidden';
+            }
+            
+            
+        
+        </script>
+        <nav>
+            <ul>
+                <li onclick="show('Page1');">Page1</li>
+                <li onclick="show('Page2');">Page2</li>
+                <li onclick="show('Page3');">Page3</li>
+            </ul>
+        </nav>
+        <br>
+    
+        
+        <div id="Page1" class="page">
+            <h1>Voorstelling</h1>
+            <p>Hallo, ik ben Kevin. Ik studeer Toegepaste informatica bij Odisee.</p>
+            <img src="Pictures/Capture.PNG" alt="een foto van Kevin" title="Foto van kevin">
+            <img id="imgClosed" src="Pictures/closed.jpg" onclick="showH(imgClosed, imgOpen);">
+            <img id="imgOpen" src="Pictures/open.jpg" onclick="showH(imgOpen, imgClosed);">
+        </div>
+        <div id="Page2" class="page" style="display:none">
+            Content 2
+        </div>
+        <div id="Page3" class="page" style="display:none">
+            Content 3
+        </div>
+
+   
+	</body>
+</html>
