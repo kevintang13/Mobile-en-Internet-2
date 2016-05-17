@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="nl">
+	<head>
+		<meta charset="utf-8" />
+		<title>Game</title>
+		<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" >
+      <script src="http://code.jquery.com/jquery-1.12.1.min.js"> </script>
+      <script type="text/javascript" src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"> </script>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head> 
+<body onload="onload()"> 
+    <script type="text/javascript">
+        "use strict";
+        /*global $*/
+
+        var touchX;
+        var touchY;
+        var LR = true;
+        var leftw = -100;
+        var rightw = -100;    
+        
+        $(document).on('vmousedown', function(event)
+        {
+            touchX = event.pageX;
+            touchY = event.pageY;
+        });
+
+        $(document).on('tap', function(e)
+        {
+            var position = $("#ship").offset();
+            
+            
+            if (touchX > position.left)
+            {
+                var moveR = setInterval(function moveRight(){
+                    document.getElementById('ship').style.left = (position.left += 5)+'px';
+                    if ((position.left+50) > touchX)
+                        {clearInterval(moveR);}
+                }, 20); 
+            
+            }
+            
+            if (touchX < position.left)
+            {
+                var moveL = setInterval(function moveLeft(){
+                    document.getElementById('ship').style.left = (position.left -= 5)+'px';
+                    if (position.left < touchX)
+                        {clearInterval(moveL);}
+                }, 20); 
+            
+            }
+            //document.getElementById('ship').style.top = touchPos.touchY+'px';
+            
+            //ship.style.position = "absolute";
+            //ship.style.left = touchPos.touchX+'px';
+            //ship.style.top = touchPos.touchY+'px';
+            
+            //alert('left: ' + position.left + ' top: ' + position.top);
+            
+        });
+        
+
+        $(document).on('taphold', function(e)
+        {
+
+            alert('X: ' + touchX + ' Y: ' + touchY ); 
+        });
+        
+        $(document).ready(function(){
+            var shipDiv = document.getElementById('ship');
+            var bossDiv = document.getElementById('boss');
+            var gameScreenDiv = document.getElementById('gameScreen');
+            
+            bossDiv.style.left = 50+'%'
+            bossDiv.style.marginLeft = -100+'px';
+            bossDiv.style.marginRight = -100+'px';
+            bossDiv.style.position = "absolute";
+            bossDiv.style.top = 10+'%';
+            
+            
+            shipDiv.style.top = 80+'%';
+            shipDiv.style.position = "absolute";
+            
+            alert('width'+ w);
+            
+            
+        });
+        
+        function onload(){
+            var wh = window.innerWidth /2;
+            
+            
+            if (LR)
+            {
+                var moveBL = setInterval(function moveBoss(){
+                    leftw --;
+
+                    document.getElementById('boss').style.marginLeft = (leftw)+'px';
+                    if (((wh)*-1) > leftw)
+                    {
+                        clearInterval(moveBL);
+                        LR = false;
+                        onload();
+                    }
+                },20);
+                
+            }
+            else
+            {
+                var moveBR = setInterval(function moveBoss(){
+                    leftw++;
+                    document.getElementById('boss').style.marginLeft = (leftw)+'px';
+                    if (((wh-200)) < leftw)
+                    {
+                        clearInterval(moveBR);
+                        LR = true;
+                        onload();
+                    }
+                },20);
+            }
+            
+            var shootS = setInterval(function shootAuto(){
+                var bullet = document.createElement('img');
+                bullet.src = "img/oie_transparent%20(1).png";
+                
+                bullet.setAttribute("position", "absolute");
+                bullet.setAttribute("left", "100px");
+                bullet.setAttribute("top", "100px");
+            },100);
+        }
+            
+            
+        
+        
+
+    </script>
+
+    
+    
+
+        
+
+        <div id="gameScreen" style=""><img src="img/Th135_Palace_of_the_Earth_Spirits.png" style="width: 100%; height: 100%;position: absolute;">
+            <progress id="Health" value="100" max="100" style="z-index: 20000; position: absolute; width: 100%; height: 5%;"></progress>
+            <div id="boss" >
+                <img src="img/ezgif.com-resize.gif">
+            </div>
+
+            <div id="ship">    
+                <img src="img/hero%20(2).gif">        
+            </div><!-- /content -->
+        </div>
+    
+  
+
+</body>

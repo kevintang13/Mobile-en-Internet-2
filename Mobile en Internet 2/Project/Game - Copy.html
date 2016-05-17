@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="nl">
+	<head>
+		<meta charset="utf-8" />
+		<title>Les 9 : voorbeeld 7</title>
+		<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" >
+      <script src="http://code.jquery.com/jquery-1.12.1.min.js"> </script>
+      <script type="text/javascript" src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"> </script>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head> 
+<body> 
+    <script type="text/javascript">
+        "use strict";
+        /*global $*/
+
+        var touchPos = 
+        {
+            touchX : 0,
+            touchY : 0
+        }
+            
+        
+        var mouseStillDown = false;
+
+        $(document).mousedown(function(event) {
+        mouseStillDown = true;
+        doSomething();
+        });
+
+        function doSomething() {
+            if (!mouseStillDown) { return; } // we could have come back from
+                                     // SetInterval and the mouse is no longer down
+            
+
+            if (mouseStillDown) { setInterval("doSomething", 100); }
+            }
+
+        $(document).mouseup(function(event) {
+            mouseStillDown = false;
+        });
+        
+        $(document).on('vmousedown', function(event)
+        {
+            touchPos.touchX = event.pageX;
+            touchPos.touchY = event.pageY;
+            
+            down = true;
+            
+            moveRight();
+            
+        });
+        
+        funtion moveRight()
+        {
+            
+        }
+        
+        $(document).on('vmouseup', function(event)
+        {
+            down = false;
+            
+        });
+
+        $(document).on('tap', function(e)
+        {
+            
+            
+                
+            
+            //document.getElementById('ship').style.top = touchPos.touchY+'px';
+            
+            //ship.style.position = "absolute";
+            //ship.style.left = touchPos.touchX+'px';
+            //ship.style.top = touchPos.touchY+'px';
+            
+            //alert('left: ' + position.left + ' top: ' + position.top);
+            
+           
+            
+            
+        });
+
+        $(document).on('taphold', function(e)
+        {
+            down = true;
+            //alert('X: ' + touchPos.touchX + ' Y: ' + touchPos.touchY ); 
+        });
+        
+        
+
+        
+        
+
+    </script>
+    
+    
+<div data-role="page" id="index">
+
+    <div data-role="header">
+        <h1>My Title</h1>
+    </div><!-- /header -->
+
+    <div id="ship" data-role="content" style="position: absolute;">    
+        <p>Hello world</p>        
+    </div><!-- /content -->
+
+</div><!-- /page -->
+
+</body>
