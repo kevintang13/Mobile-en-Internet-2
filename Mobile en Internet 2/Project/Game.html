@@ -7,9 +7,8 @@
       <script src="http://code.jquery.com/jquery-1.12.1.min.js"> </script>
       <script type="text/javascript" src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"> </script>
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-</head> 
-<body onload="onload()"> 
-    <script type="text/javascript">
+        
+        <script type="text/javascript">
         "use strict";
         /*global $*/
 
@@ -17,7 +16,11 @@
         var touchY;
         var LR = true;
         var leftw = -100;
-        var rightw = -100;    
+        var shipDiv , bossDiv, gameScreenDiv, wh, moveB, shootS;
+        var position, bossPosition, BossRight;
+        var bullet, bulletT, bulletMS, bulletL;
+        var health, bossBot;
+        var ready = 0;
         
         $(document).on('vmousedown', function(event)
         {
@@ -27,49 +30,38 @@
 
         $(document).on('tap', function(e)
         {
-            var position = $("#ship").offset();
-            
-            
-            if (touchX > position.left)
+            if(ready == 1)
             {
-                var moveR = setInterval(function moveRight(){
-                    document.getElementById('ship').style.left = (position.left += 5)+'px';
-                    if ((position.left+50) > touchX)
-                        {clearInterval(moveR);}
-                }, 20); 
+                position= $("#ship").offset();
+        
+                if (touchX > position.left)
+                {
+                    var moveR = setInterval(function moveRight(){
+                        document.getElementById('ship').style.left = (position.left += 5)+'px';
+                        if ((position.left+50) > touchX)
+                            {clearInterval(moveR);}
+                    }, 20); 
+                }
             
+                if (touchX < position.left)
+                {
+                    var moveL = setInterval(function moveLeft(){
+                        document.getElementById('ship').style.left = (position.left -= 5)+'px';
+                        if (position.left < touchX)
+                            {clearInterval(moveL);}
+                    }, 20); 
+                }
             }
             
-            if (touchX < position.left)
-            {
-                var moveL = setInterval(function moveLeft(){
-                    document.getElementById('ship').style.left = (position.left -= 5)+'px';
-                    if (position.left < touchX)
-                        {clearInterval(moveL);}
-                }, 20); 
-            
-            }
-            //document.getElementById('ship').style.top = touchPos.touchY+'px';
-            
-            //ship.style.position = "absolute";
-            //ship.style.left = touchPos.touchX+'px';
-            //ship.style.top = touchPos.touchY+'px';
-            
-            //alert('left: ' + position.left + ' top: ' + position.top);
-            
         });
-        
-
-        $(document).on('taphold', function(e)
-        {
-
-            alert('X: ' + touchX + ' Y: ' + touchY ); 
-        });
-        
+    
         $(document).ready(function(){
-            var shipDiv = document.getElementById('ship');
-            var bossDiv = document.getElementById('boss');
-            var gameScreenDiv = document.getElementById('gameScreen');
+            shipDiv = document.getElementById('ship');
+            bossDiv = document.getElementById('boss');
+            gameScreenDiv = document.getElementById('gameScreen');
+            wh = window.innerWidth /2;
+            
+            health = document.getElementById('Health').value;
             
             bossDiv.style.left = 50+'%'
             bossDiv.style.marginLeft = -100+'px';
@@ -77,77 +69,96 @@
             bossDiv.style.position = "absolute";
             bossDiv.style.top = 10+'%';
             
-            
             shipDiv.style.top = 80+'%';
+            shipDiv.style.left = 50+'%'; 
             shipDiv.style.position = "absolute";
             
-            alert('width'+ w);
+            position= $("#ship").offset();
             
             
         });
-        
-        function onload(){
-            var wh = window.innerWidth /2;
-            
-            
-            if (LR)
-            {
-                var moveBL = setInterval(function moveBoss(){
-                    leftw --;
-
-                    document.getElementById('boss').style.marginLeft = (leftw)+'px';
-                    if (((wh)*-1) > leftw)
-                    {
-                        clearInterval(moveBL);
-                        LR = false;
-                        onload();
-                    }
-                },20);
-                
-            }
-            else
-            {
-                var moveBR = setInterval(function moveBoss(){
-                    leftw++;
-                    document.getElementById('boss').style.marginLeft = (leftw)+'px';
-                    if (((wh-200)) < leftw)
-                    {
-                        clearInterval(moveBR);
-                        LR = true;
-                        onload();
-                    }
-                },20);
-            }
-            
-            var shootS = setInterval(function shootAuto(){
-                var bullet = document.createElement('img');
-                bullet.src = "img/oie_transparent%20(1).png";
-                
-                bullet.setAttribute("position", "absolute");
-                bullet.setAttribute("left", "100px");
-                bullet.setAttribute("top", "100px");
-            },100);
+        function startGame(){
+            moveB = setInterval(moveBossR, 10);
+            shootAuto();
+            ready = 1;
         }
+        function shootAuto(){
+            bullet = document.createElement('img');
+            bullet.src = "img/bulletShip.png";
             
+            $(bullet).css('position', 'absolute');
+            $(bullet).css('left', 50+'%');
             
-        
-        
-
+            $(bullet).css('top', 80+'%');
+            document.getElementById('gameScreen').appendChild(bullet);
+            bulletMS = setInterval(BulletM,10);
+            }
+            
+        function BulletM(){
+            bulletT = $(bullet).css('top').substring(0,$(bullet).css('top').length-2);
+            bulletL = $(bullet).offset().left;
+            
+            bossPosition = $('#boss').offset();
+            BossRight =  bossPosition.left + 200;
+            bossBot =bossPosition.top + 200 ;
+            if (bulletT < 0)
+            {
+                bulletT = position.top;
+                $(bullet).css('left', position.left+55+'px');
+            }
+            bulletT -=10;
+            $(bullet).css('top', bulletT+'px');
+            if (bulletL > bossPosition.left && bulletL < BossRight && bulletT < bossBot && bulletT > bossPosition.top)
+            {
+                bulletT = position.top;
+                $(bullet).css('top', bulletT+'px');
+                $(bullet).css('left', position.left+55+'px');
+                health -= 2;
+                document.getElementById('Health').value = health;
+                
+            }
+            }
+        function clearGame(){
+            clearInterval(moveB);
+            clearInterval(bulletMS);
+        }
+       
+        function moveBossL(){
+            leftw -= 3;
+            document.getElementById('boss').style.marginLeft = (leftw)+'px';
+            if (((wh)*-1) > leftw)
+            {
+                clearInterval(moveB);
+                moveB = setInterval(moveBossR, 20);
+            }
+            }
+        function moveBossR(){
+            leftw+=3;
+            document.getElementById('boss').style.marginLeft = (leftw)+'px';
+            if (((wh-200)) < leftw)
+            {
+                clearInterval(moveB);
+                moveB = setInterval(moveBossL, 20);
+            }
+            }
     </script>
-
+</head> 
+<body> 
     
-    
 
-        
+        <div id="startScreen" data-role="page">
+            <a href="#gameScreen" data-role="button" style="width: 100px; left: 50%; margin-left: -50px;" onclick="startGame()">Start</a>
+        </div>
 
-        <div id="gameScreen" style=""><img src="img/Th135_Palace_of_the_Earth_Spirits.png" style="width: 100%; height: 100%;position: absolute;">
-            <progress id="Health" value="100" max="100" style="z-index: 20000; position: absolute; width: 100%; height: 5%;"></progress>
+        <div id="gameScreen" data-role="page">
+            <img id="background" src="img/Th135_Palace_of_the_Earth_Spirits.png" style="width: 100%; height: 100%;position: absolute;">
+            <progress id="Health" value="100" max="100" style="z-index: 20; position: absolute; width: 100%; height: 5%;"></progress>
             <div id="boss" >
                 <img src="img/ezgif.com-resize.gif">
             </div>
 
-            <div id="ship">    
-                <img src="img/hero%20(2).gif">        
+            <div id="ship" style="left: 50%; top: 80%;">    
+                <img src="img/hero%20(2).gif" >        
             </div><!-- /content -->
         </div>
     
