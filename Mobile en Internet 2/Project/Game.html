@@ -8,10 +8,10 @@
       <script type="text/javascript" src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"> </script>
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         
-        <script type="text/javascript">
+    <script type="text/javascript">
         "use strict";
         /*global $*/
-
+        // Alle variabels
         var touchX;
         var touchY;
         var LR = true;
@@ -19,30 +19,39 @@
         var shipDiv , bossDiv, gameScreenDiv, wh, moveB, shootS;
         var position, bossPosition, BossRight;
         var bullet, bulletT, bulletMS, bulletL;
-        var health, bossBot;
+        var bossbullet, bossbulletPos, bossBulletAuto;
+        var winImg, deathAnimation, loseImg;
+        var health, bossBot, healthHero;
         var ready = 0;
+        var bigBullets = false;
         
+        //bij on mousedown geef de X en Y waardes door
         $(document).on('vmousedown', function(event)
         {
             touchX = event.pageX;
             touchY = event.pageY;
         });
-
+        
+        //controls voor muis
         $(document).on('tap', function(e)
         {
-            if(ready == 1)
+            if(ready == 1) // wachten tot er op de start knop wordt gedrukt
             {
+                //Zet de positie waardes van schip in position
                 position= $("#ship").offset();
-        
+                
+                //kijkt of het naar rechts moet gaan
                 if (touchX > position.left)
                 {
+                    //Hero beweegt naar rechts door middel van setInterval
                     var moveR = setInterval(function moveRight(){
                         document.getElementById('ship').style.left = (position.left += 5)+'px';
-                        if ((position.left+50) > touchX)
+                        // Als Hero bij de X positie komt van muis, stopt die
+                        if ((position.left + 50) > touchX)
                             {clearInterval(moveR);}
                     }, 20); 
                 }
-            
+                //kijkt of het naar links moet gaan en zelfde functie als hierboven
                 if (touchX < position.left)
                 {
                     var moveL = setInterval(function moveLeft(){
@@ -54,14 +63,17 @@
             }
             
         });
-    
+        
+        //als de document klaar is, krijgt alles de juiste positie en waardes 
         $(document).ready(function(){
+            
             shipDiv = document.getElementById('ship');
             bossDiv = document.getElementById('boss');
             gameScreenDiv = document.getElementById('gameScreen');
             wh = window.innerWidth /2;
             
-            health = document.getElementById('Health').value;
+            health = 100;
+            healthHero = 100;
             
             bossDiv.style.left = 50+'%'
             bossDiv.style.marginLeft = -100+'px';
@@ -77,23 +89,134 @@
             
             
         });
+        //functie voor het beginnen van de spel
         function startGame(){
+            //beweging van de Boss
             moveB = setInterval(moveBossR, 10);
-            shootAuto();
-            ready = 1;
+            bulletHeroCreate(); // aanmaken van de kogel van Hero
+            ready = 1; // start knop is ingedrukt
+            bulletBossCreate(); // aanmaken van de boss kogels
         }
-        function shootAuto(){
+       // aanmaken van de kogel van Hero
+        function bulletHeroCreate(){
             bullet = document.createElement('img');
             bullet.src = "img/bulletShip.png";
             
             $(bullet).css('position', 'absolute');
             $(bullet).css('left', 50+'%');
-            
             $(bullet).css('top', 80+'%');
             document.getElementById('gameScreen').appendChild(bullet);
-            bulletMS = setInterval(BulletM,10);
+            
+            bulletMS = setInterval(BulletM,10); // beweging van de kogel van Hero en hit detectie
+            }
+        // aanmaken van de boss kogels
+        function bulletBossCreate(){
+            
+            var i, x;
+            bossPosition = $('#boss').offset();
+            bossbulletPos = $('#boss').offset();
+            
+            for (i = 0; i < 5 ; i++) // maakt 5 van dezelfde kogels
+            {
+                bossbullet = document.createElement('img');
+                bossbullet.src = "img/oie_transparent%20(8).png";
+                $(bossbullet).addClass("BossBullet"+ i);
+            
+                $(bossbullet).css('position', 'absolute');
+                $(bossbullet).css('left', bossPosition.left + 100 + 'px');
+                $(bossbullet).css('top', bossPosition.top + 200 + 'px');
+                document.getElementById('gameScreen').appendChild(bossbullet);
             }
             
+            bossBulletAuto = setInterval(bulletBossM,20); // beweging van de kogel van Boss en hit detectie
+        }
+        
+        function bulletBossM(){ // beweging van de kogel van Boss en hit detectie
+            var i,x,y;
+            
+            for (i = 0; i < 5 ; i++) // beweging voor de 5 kogels
+            {
+                $(".BossBullet"+i).css('left', $(".BossBullet"+i).offset().left + (0.5*i*1.1) + 'px');
+                $(".BossBullet"+i).css('top', $(".BossBullet"+i).offset().top + 8 + 'px');
+                bossbulletPos = $(".BossBullet"+i).offset();
+                
+                // kijken of de kogels de onderkant van het scherm raken => reset positie
+                if (bossbulletPos.top +50> window.innerHeight)  
+                {
+                    $(".BossBullet"+i).css('left', bossPosition.left + 100 + 'px');
+                    $(".BossBullet"+i).css('top', bossPosition.top + 200 + 'px');
+                    bossbulletPos = $('#boss').offset();
+                }
+                
+                //hit detection op Hero
+                if ( $(".BossBullet"+i).offset().left > position.left && $(".BossBullet"+i).offset().left < position.left + 115 && $(".BossBullet"+i).offset().top > position.top)
+                {
+                    for (y = 0; y < 5; y++ ) // reset positie voor 5 kogels
+                    {
+                        $(".BossBullet"+y).css('left', bossPosition.left + 100 + 'px');
+                        $(".BossBullet"+y).css('top', bossPosition.top + 200 + 'px');
+                        bossbulletPos = $('#boss').offset();
+                    }
+                    healthHero -= 10;
+                    document.getElementById('HealthHero').style.width = healthHero+ '%';
+                    if (healthHero <= 0)
+                    {loseGame();}
+                }
+            }
+            //Als de levens van Boss onder 25 is
+            if (health <= 25)
+            {
+                document.getElementById('Health').style.backgroundColor = "red";
+                if (bigBullets == false)
+                {
+                    for (x = 0; x < 2 ; x++) // aanmaak van 2 grote kogels
+                    {
+                        bossbullet = document.createElement('img');
+                        bossbullet.src = "img/oie_transparent%20(7).png";
+                        $(bossbullet).addClass("BossBulletB"+ x);
+            
+                        $(bossbullet).css('position', 'absolute');
+                        $(bossbullet).css('left', bossPosition.left+ (200*x) + 'px');
+                        $(bossbullet).css('top', bossPosition.top + 200 + 'px');
+                        document.getElementById('gameScreen').appendChild(bossbullet);
+                        bigBullets = true;
+                    }
+                   
+                }
+            for (x = 0; x < 2 ; x++) // bewegen van de 2 grote kogels
+            {
+                $(".BossBulletB"+x).css('left', $(".BossBulletB"+x).offset().left + (1*x*1.1) + 'px');
+                $(".BossBulletB"+x).css('top', $(".BossBulletB"+x).offset().top + 8 + 'px');
+                bossbulletPos = $(".BossBulletB"+x).offset();
+                
+                // kijken of de kogels de onderkant van het scherm raken => reset positie
+                if (bossbulletPos.top +62> window.innerHeight)
+                {
+                    $(".BossBulletB"+x).css('left', bossPosition.left + (200*x) + 'px');
+                    $(".BossBulletB"+x).css('top', bossPosition.top + 200 + 'px');
+                    bossbulletPos = $('#boss').offset();
+                }
+                
+                //hit detection op Hero
+                if ( $(".BossBulletB"+x).offset().left > position.left && $(".BossBulletB"+x).offset().left < position.left + 115 && $(".BossBulletB"+x).offset().top > position.top)
+                {
+                    for (y = 0; y < 2; y++ ) // reset positie voor 2 grote kogels
+                    {
+                        $(".BossBulletB"+y).css('left', bossPosition.left + (200*y) + 'px');
+                        $(".BossBulletB"+y).css('top', bossPosition.top + 200 + 'px');
+                        bossbulletPos = $('#boss').offset();
+                    }
+                    healthHero -= 25;
+                    document.getElementById('HealthHero').style.width = healthHero+ '%';
+                    if (healthHero <= 0)
+                    {loseGame();}
+                }
+            }
+            }
+            
+        }
+        
+        //beweging van de kogel van Hero
         function BulletM(){
             bulletT = $(bullet).css('top').substring(0,$(bullet).css('top').length-2);
             bulletL = $(bullet).offset().left;
@@ -114,15 +237,49 @@
                 $(bullet).css('top', bulletT+'px');
                 $(bullet).css('left', position.left+55+'px');
                 health -= 2;
-                document.getElementById('Health').value = health;
-                
+                document.getElementById('Health').style.width = health + '%';
+                if(health <= 0)
+                {clearGame();}
             }
             }
+        // functie voor het winnen van het spel
         function clearGame(){
             clearInterval(moveB);
             clearInterval(bulletMS);
+            clearInterval(bossBulletAuto);
+            
+            winImg = document.createElement('img');
+            winImg.src = "img/ezgif-282658018.png";
+            
+            $(winImg).css('position', 'absolute');
+            $(winImg).css('left', 35+'%');
+            $(winImg).css('top', 35+ '%');
+            document.getElementById('gameScreen').appendChild(winImg);
+            
+            deathAnimation = document.createElement('img');
+            deathAnimation.src = "img/oie_2119423vCHDZFH4.gif";
+            
+            $(deathAnimation).css('position', 'absolute');
+            $(deathAnimation).css('left', bossPosition.left - 180+'px');
+            $(deathAnimation).css('top', bossPosition.top -100+ 'px');
+            document.getElementById('gameScreen').appendChild(deathAnimation);
+            
         }
-       
+        // functie voor verliezen van het spel
+        function loseGame(){
+            clearInterval(moveB);
+            clearInterval(bulletMS);
+            clearInterval(bossBulletAuto);
+            
+            loseImg = document.createElement('img');
+            loseImg.src = "img/oie_j8PUkHb9AyOh.png";
+            
+            $(loseImg).css('position', 'absolute');
+            $(loseImg).css('left', 35+'%');
+            $(loseImg).css('top', 35+ '%');
+            document.getElementById('gameScreen').appendChild(loseImg);
+            }
+        // het links bewegen van Boss
         function moveBossL(){
             leftw -= 3;
             document.getElementById('boss').style.marginLeft = (leftw)+'px';
@@ -132,6 +289,7 @@
                 moveB = setInterval(moveBossR, 20);
             }
             }
+        // het rechts bewegen van Boss
         function moveBossR(){
             leftw+=3;
             document.getElementById('boss').style.marginLeft = (leftw)+'px';
@@ -145,21 +303,32 @@
 </head> 
 <body> 
     
-
+        <!-- had problemem met het linken van een css bestand dus heb de styles hier geplaatst-->
         <div id="startScreen" data-role="page">
-            <a href="#gameScreen" data-role="button" style="width: 100px; left: 50%; margin-left: -50px;" onclick="startGame()">Start</a>
-        </div>
+            <img id="background2" src="img/Th135_Palace_of_the_Earth_Spirits.png" style="width: 100%; height: 100%;position: absolute;">
+            <div >
+                <h1 style="position: absolute; z-index: 20; margin-left: 40%; margin-right: 35%;top: 25%; font-size: 4em; color: white; font-style: italic">Game project</h1>
+                <p style="position: absolute; z-index: 20; margin-left: 40%; margin-right: 35%;top: 40%; 4em; color: white; font-style: italic">By kevin tang</p>
+            </div>
+            <a href="#gameScreen" data-role="button" style="position: absolute;width: 100px; left: 49%; margin-left: -50px;top: 50%;" onclick="startGame()">Start</a>
 
+        </div>
+        
         <div id="gameScreen" data-role="page">
             <img id="background" src="img/Th135_Palace_of_the_Earth_Spirits.png" style="width: 100%; height: 100%;position: absolute;">
-            <progress id="Health" value="100" max="100" style="z-index: 20; position: absolute; width: 100%; height: 5%;"></progress>
+            
+            <div id="Health" style="z-index: 20; position: absolute; width: 100%; height: 5%; background-color: green;"></div>\
+
             <div id="boss" >
                 <img src="img/ezgif.com-resize.gif">
             </div>
-
+            
             <div id="ship" style="left: 50%; top: 80%;">    
                 <img src="img/hero%20(2).gif" >        
             </div><!-- /content -->
+            
+            <div id="HealthHero" style="z-index: 20; position: absolute; width: 100%; height: 5%; top: 95%; background-color: green;"></div>
+            
         </div>
     
   
